@@ -1,0 +1,52 @@
+BootStrap: docker
+From: fedora:latest
+
+%labels
+Maintainer Daniel Rodriguez
+
+%setup
+install -Dv \
+        Downloads/cplex_studio2210.linux_x86_64.bin \
+        ${SINGULARITY_ROOTFS}/opt/cplex_studio2210.linux_x86_64.bin
+        
+install -Dv \
+        response.properties \
+        ${SINGULARITY_ROOTFS}/opt/response.properties
+%runscript
+jupyter notebook
+
+%environment
+
+
+
+%post
+
+#System files
+dnf -y update
+dnf -y install wget git python3-pip hostname sqlite python3-biopython python-pip-wheel python3-devel gcc
+
+
+
+#jupyter
+pip install 'wheel'
+
+pip install \
+	'jupyter' \
+	'pandas' \
+	'matplotlib' \
+	'numpy' \
+	'bokeh' \
+	'escher' \
+	'cobra' \
+	'commmodelpy' \
+	'equilibrator-api'
+pip install markupsafe==2.0.1
+
+#install CPLEX
+./opt/cplex_studio2210.linux_x86_64.bin -f /opt/response.properties
+
+python3 /opt/ibm/ILOG/CPLEX_Studio221/python/setup.py install
+
+
+
+
